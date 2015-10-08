@@ -1,2 +1,2 @@
-# oblivion-bin-client-erlang
-0blivi0n binary API client for ERLANG applications
+# OPEC
+0blivi0n protocol Erlang Client
