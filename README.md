@@ -1,2 +1,2 @@
 # OPEC
-0blivi0n protocol Erlang Client
+0blivi0n protocol Erlang client
