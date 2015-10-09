@@ -1,2 +1,2 @@
-# OPEC
-0blivi0n protocol Erlang client
+# PENCIL
+0blivi0n's binary protocol client
