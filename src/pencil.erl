@@ -129,15 +129,15 @@ process_error(Error) ->
 
 call(Operation, Resource) ->
 	poolboy:transaction(?MODULE, fun(Worker) ->
-        	mec:call(Worker, Operation, Resource)
-    	end).
+				mec:call(Worker, Operation, Resource)
+		end).
 
 call(Operation, Resource, Params) ->
 	poolboy:transaction(?MODULE, fun(Worker) ->
-        	mec:call(Worker, Operation, Resource, Params)
-    	end).
+				mec:call(Worker, Operation, Resource, Params)
+		end).
 
 call(Operation, Resource, Params, Payload) ->
 	poolboy:transaction(?MODULE, fun(Worker) ->
-        	mec:call(Worker, Operation, Resource, Params, Payload)
-    	end).
+				mec:call(Worker, Operation, Resource, Params, Payload)
+		end).
