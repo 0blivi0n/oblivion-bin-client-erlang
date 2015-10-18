@@ -39,46 +39,66 @@ start_link(Args) ->
 	Port = proplists:get_value(port, Args),
 	mec:open(Server, Port).
 
+-spec put(Cache :: binary(), Key :: binary(), Value :: jsondoc:jsondoc()) -> 
+	{error, Reason :: any()} | {ok, Version :: integer()}.
 put(Cache, Key, Value) when is_binary(Cache) andalso is_binary(Key) ->
 	Json = jsondoc:ensure(Value),
 	Response = call(?PUT_CMD, [<<"caches">>, Cache, <<"keys">>, Key], [], Json),
 	process(?PUT_CMD, Response).
 
+-spec put(Cache :: binary(), Key :: binary(), Value :: jsondoc:jsondoc(), Version :: integer()) -> 
+	{error, Reason :: any()} | {ok, NewVersion :: integer()}.
 put(Cache, Key, Value, Version) when is_binary(Cache) andalso is_binary(Key) ->
 	Params = [{?VERSION_TAG, Version}],
 	Json = jsondoc:ensure(Value),
 	Response = call(?PUT_CMD, [<<"caches">>, Cache, <<"keys">>, Key], Params, Json),
 	process(?PUT_CMD, Response).
 
+-spec get(Cache :: binary(), Key :: binary()) ->
+	{error, Reason :: any()} | {ok, Value :: jsondoc:jsondoc(), Version :: integer()}.
 get(Cache, Key) when is_binary(Cache) andalso is_binary(Key) ->
 	Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
 	process(?GET_CMD, Response).
 
+-spec delete(Cache :: binary(), Key :: binary()) ->
+	{error, Reason :: any()} | ok.
 delete(Cache, Key) when is_binary(Cache) andalso is_binary(Key) ->
 	Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
 	process(?DELETE_CMD, Response).
 
+-spec delete(Cache :: binary(), Key :: binary(), Version :: integer()) ->
+	{error, Reason :: any()} | ok.
 delete(Cache, Key, Version) when is_binary(Cache) andalso is_binary(Key) ->
 	Params = [{?VERSION_TAG, Version}],
 	Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>, Key], Params),
 	process(?DELETE_CMD, Response).
 
+-spec version(Cache :: binary(), Key :: binary()) -> 
+	{error, Reason :: any()} | {ok, Version :: integer()}.
 version(Cache, Key) when is_binary(Cache) andalso is_binary(Key) ->
 	Response = call(?VERSION_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
 	process(?VERSION_CMD, Response).
 
+-spec size(Cache :: binary()) -> 
+	{error, Reason :: any()} | {ok, Size :: integer()}.
 size(Cache) when is_binary(Cache) ->
 	Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>]),
 	process(?SIZE_CMD, Response).	
 
+-spec flush(Cache :: binary()) -> 
+	{error, Reason :: any()} | ok.
 flush(Cache) when is_binary(Cache) ->
 	Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>]),
 	process(?FLUSH_CMD, Response).	
 
+-spec caches() -> 
+	{error, Reason :: any()} | {ok, Caches :: list()}.
 caches() ->
 	Response = call(?GET_CMD, [<<"caches">>]),
 	process(?CACHES_CMD, Response).		
 
+-spec keys(Cache :: binary()) -> 
+	{error, Reason :: any()} | {ok, Keys :: list()}.
 keys(Cache) when is_binary(Cache) ->
 	Params = [{?LIST_TAG, true}],
 	Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>], Params),
