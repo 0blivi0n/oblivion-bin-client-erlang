@@ -51,8 +51,8 @@ ok
 ```
 
 
-Worker instances
-----------------
+API
+---
 
 The module ```pencil``` provides the following functions to interact with the 0blivi0n's server.
 
