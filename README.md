@@ -104,7 +104,7 @@ Examples
 ```erlang
 6> pencil:put(<<"test">>, <<"jr">>, <<"Joaquim Rocha">>).
 {ok,1447028787208699}
-7> pencil:put(<<"test">>, <<"jr">>, <<"Joaquim JR Rocha">>, 1447028787208699).
+7> pencil:put(<<"test">>, <<"jr">>, <<"Joaquim JM Rocha">>, 1447028787208699).
 {ok,1447028814375356}
 8> pencil:put(<<"test">>, <<"array">>, [1, 3, true, <<"Text">>, 123.4]).      
 {ok,1447028874693208}
