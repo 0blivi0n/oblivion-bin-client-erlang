@@ -26,7 +26,8 @@
 		kernel, 
 		stdlib,
 		mec,
-		poolboy
+		poolboy,
+		jsondoc
 	]},
 	{mod, {pencil_app, []}},
 	{env, [
