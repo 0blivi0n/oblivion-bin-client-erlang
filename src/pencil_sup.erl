@@ -1,5 +1,5 @@
 %%
-%% Copyright 2015 Joaquim Rocha <jrocha@gmailbox.org>
+%% Copyright 2015-16 Joaquim Rocha <jrocha@gmailbox.org>
 %% 
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
@@ -25,26 +25,26 @@
 -export([start_link/0]).
 
 start_link() ->
-	supervisor:start_link(?MODULE, []).
+  supervisor:start_link(?MODULE, []).
 
 %% ====================================================================
 %% Behavioural functions
 %% ====================================================================
 
 init([]) ->
-	Server = application:get_env(pencil, oblivion_server, "127.0.0.1"),
-	Port = application:get_env(pencil, oblivion_port, 12521),
-	WorkerCount = erlang:system_info(schedulers),
-	PoolArgs = [
-			{name,{local, pencil}}, 
-			{worker_module, pencil}, 
-			{size, WorkerCount}, 
-			{max_overflow, WorkerCount * 2}],
-	WorkerArgs = [
-			{server, Server},
-			{port, Port}],
-	PoolSpecs =  poolboy:child_spec(pencil, PoolArgs, WorkerArgs),
-	{ok, {{one_for_one, 5, 60}, [PoolSpecs]}}.
+  Server = application:get_env(pencil, oblivion_server),
+  Port = application:get_env(pencil, oblivion_port),
+  WorkerCount = erlang:system_info(schedulers),
+  PoolArgs = [
+               {name, {local, pencil}},
+               {worker_module, pencil},
+               {size, WorkerCount},
+               {max_overflow, WorkerCount * 2}],
+  WorkerArgs = [
+                 {server, Server},
+                 {port, Port}],
+  PoolSpecs = poolboy:child_spec(pencil, PoolArgs, WorkerArgs),
+  {ok, {{one_for_one, 5, 60}, [PoolSpecs]}}.
 
 %% ====================================================================
 %% Internal functions

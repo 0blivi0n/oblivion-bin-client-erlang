@@ -22,3 +22,12 @@
 -define(FLUSH_CMD, <<"FLUSH">>).
 -define(CACHES_CMD, <<"CACHE_LIST">>).
 -define(KEYS_CMD, <<"KEY_LIST">>).
+
+
+-define(VERSION_TAG, <<"version">>).
+-define(SORT_TAG, <<"sort">>).
+-define(INCLUDE_CONFIG_TAG, <<"include_config">>).
+-define(INCLUDE_SIZE_TAG, <<"include_size">>).
+-define(LIST_TAG, <<"list">>).
+
+-define(ERROR_REASON_TAG, <<"reason">>).

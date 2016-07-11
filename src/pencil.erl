@@ -17,7 +17,7 @@
 -module(pencil).
 
 -include("pencil.hrl").
--include_lib("oblivion/include/oblivion_protocol.hrl").
+-include_lib("mec/include/mec.hrl").
 
 -export([start_link/1]).
 
@@ -35,129 +35,141 @@
 %% ====================================================================
 
 start_link(Args) ->
-	Server = proplists:get_value(server, Args),
-	Port = proplists:get_value(port, Args),
-	mec:open(Server, Port).
+  Server = proplists:get_value(server, Args),
+  Port = proplists:get_value(port, Args),
+  mec:open(Server, Port).
 
--spec put(Cache :: binary(), Key :: binary(), Value :: jsondoc:jsondoc()) -> 
-	{error, Reason :: any()} | {ok, Version :: integer()}.
+-spec put(Cache :: binary(), Key :: binary(), Value :: jsondoc:jsondoc()) ->
+  {error, Reason :: any()} | {ok, Version :: integer()}.
 put(Cache, Key, Value) when is_binary(Cache) andalso is_binary(Key) ->
-	Json = jsondoc:ensure(Value),
-	Response = call(?PUT_CMD, [<<"caches">>, Cache, <<"keys">>, Key], [], Json),
-	process(?PUT_CMD, Response).
+  Json = jsondoc:ensure(Value),
+  Response = call(?PUT_CMD, [<<"caches">>, Cache, <<"keys">>, Key], [], Json),
+  process(?PUT_CMD, Response).
 
--spec put(Cache :: binary(), Key :: binary(), Value :: jsondoc:jsondoc(), Version :: integer()) -> 
-	{error, Reason :: any()} | {ok, NewVersion :: integer()}.
+-spec put(Cache :: binary(), Key :: binary(), Value :: jsondoc:jsondoc(), Version :: integer()) ->
+  {error, Reason :: any()} | {ok, NewVersion :: integer()}.
 put(Cache, Key, Value, Version) when is_binary(Cache) andalso is_binary(Key) ->
-	Params = [{?VERSION_TAG, Version}],
-	Json = jsondoc:ensure(Value),
-	Response = call(?PUT_CMD, [<<"caches">>, Cache, <<"keys">>, Key], Params, Json),
-	process(?PUT_CMD, Response).
+  Params = #{?VERSION_TAG => Version},
+  Json = jsondoc:ensure(Value),
+  Response = call(?PUT_CMD, [<<"caches">>, Cache, <<"keys">>, Key], Params, Json),
+  process(?PUT_CMD, Response).
 
 -spec get(Cache :: binary(), Key :: binary()) ->
-	{error, Reason :: any()} | {ok, Value :: jsondoc:jsondoc(), Version :: integer()}.
+  {error, Reason :: any()} | {ok, Value :: jsondoc:jsondoc(), Version :: integer()}.
 get(Cache, Key) when is_binary(Cache) andalso is_binary(Key) ->
-	Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
-	process(?GET_CMD, Response).
+  Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
+  process(?GET_CMD, Response).
 
 -spec delete(Cache :: binary(), Key :: binary()) ->
-	{error, Reason :: any()} | ok.
+  {error, Reason :: any()} | ok.
 delete(Cache, Key) when is_binary(Cache) andalso is_binary(Key) ->
-	Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
-	process(?DELETE_CMD, Response).
+  Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
+  process(?DELETE_CMD, Response).
 
 -spec delete(Cache :: binary(), Key :: binary(), Version :: integer()) ->
-	{error, Reason :: any()} | ok.
+  {error, Reason :: any()} | ok.
 delete(Cache, Key, Version) when is_binary(Cache) andalso is_binary(Key) ->
-	Params = [{?VERSION_TAG, Version}],
-	Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>, Key], Params),
-	process(?DELETE_CMD, Response).
+  Params = #{?VERSION_TAG => Version},
+  Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>, Key], Params),
+  process(?DELETE_CMD, Response).
 
--spec version(Cache :: binary(), Key :: binary()) -> 
-	{error, Reason :: any()} | {ok, Version :: integer()}.
+-spec version(Cache :: binary(), Key :: binary()) ->
+  {error, Reason :: any()} | {ok, Version :: integer()}.
 version(Cache, Key) when is_binary(Cache) andalso is_binary(Key) ->
-	Response = call(?VERSION_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
-	process(?VERSION_CMD, Response).
+  Response = call(?VERSION_CMD, [<<"caches">>, Cache, <<"keys">>, Key]),
+  process(?VERSION_CMD, Response).
 
--spec size(Cache :: binary()) -> 
-	{error, Reason :: any()} | {ok, Size :: integer()}.
+-spec size(Cache :: binary()) ->
+  {error, Reason :: any()} | {ok, Size :: integer()}.
 size(Cache) when is_binary(Cache) ->
-	Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>]),
-	process(?SIZE_CMD, Response).	
+  Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>]),
+  process(?SIZE_CMD, Response).
 
--spec flush(Cache :: binary()) -> 
-	{error, Reason :: any()} | ok.
+-spec flush(Cache :: binary()) ->
+  {error, Reason :: any()} | ok.
 flush(Cache) when is_binary(Cache) ->
-	Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>]),
-	process(?FLUSH_CMD, Response).	
+  Response = call(?DELETE_CMD, [<<"caches">>, Cache, <<"keys">>]),
+  process(?FLUSH_CMD, Response).
 
--spec caches() -> 
-	{error, Reason :: any()} | {ok, Caches :: list()}.
+-spec caches() ->
+  {error, Reason :: any()} | {ok, Caches :: list()}.
 caches() ->
-	Response = call(?GET_CMD, [<<"caches">>]),
-	process(?CACHES_CMD, Response).		
+  Response = call(?GET_CMD, [<<"caches">>]),
+  process(?CACHES_CMD, Response).
 
--spec keys(Cache :: binary()) -> 
-	{error, Reason :: any()} | {ok, Keys :: list()}.
+-spec keys(Cache :: binary()) ->
+  {error, Reason :: any()} | {ok, Keys :: list()}.
 keys(Cache) when is_binary(Cache) ->
-	Params = [{?LIST_TAG, true}],
-	Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>], Params),
-	process(?KEYS_CMD, Response).	
+  Params = #{?LIST_TAG => true},
+  Response = call(?GET_CMD, [<<"caches">>, Cache, <<"keys">>], Params),
+  process(?KEYS_CMD, Response).
 
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
 
 process(_Cmd, Error = {error, _Reason}) -> Error;
-process(Cmd, {ok, Status, Params, Payload}) ->
-	process_response(Cmd, Status, Params, Payload).
+process(Cmd, {ok, #mercury_reply{status = Status, params = Params, payload = Payload}}) ->
+  process_response(Cmd, Status, Params, Payload).
 
 % GET
-process_response(?GET_CMD, 200, Params, Payload) ->
-	{_, Version} = lists:keyfind(?VERSION_TAG, 1, Params),
-	{ok, Payload, Version};
+process_response(?GET_CMD, 200, #{?VERSION_TAG := Version}, Payload) ->
+  {ok, Payload, Version};
 % PUT
-process_response(?PUT_CMD, 201, Params, _Payload) ->
-	{_, Version} = lists:keyfind(?VERSION_TAG, 1, Params),
-	{ok, Version};
+process_response(?PUT_CMD, 201, #{?VERSION_TAG := Version}, _Payload) ->
+  {ok, Version};
 % DELETE
 process_response(?DELETE_CMD, 200, _Params, _Payload) -> ok;
 % VERSION
-process_response(?VERSION_CMD, 200, Params, _Payload) -> 
-	{_, Version} = lists:keyfind(?VERSION_TAG, 1, Params),
-	{ok, Version};
+process_response(?VERSION_CMD, 200, #{?VERSION_TAG := Version}, _Payload) ->
+  {ok, Version};
 % SIZE
-process_response(?SIZE_CMD, 200, _Params, Size) -> 
-	{ok, Size};
+process_response(?SIZE_CMD, 200, _Params, Size) ->
+  {ok, Size};
 % FLUSH
-process_response(?FLUSH_CMD, 202, _Params, _Payload) -> ok; 
+process_response(?FLUSH_CMD, 202, _Params, _Payload)  -> ok;
 % KEY LIST
-process_response(?KEYS_CMD, 200, _Params, Payload) -> 
-	List = jsondoc:get_value(<<"keys">>, Payload),
-	{ok, List};
+process_response(?KEYS_CMD, 200, _Params, Payload) ->
+  List = jsondoc:get_value(<<"keys">>, Payload),
+  {ok, List};
 % CACHE LIST
-process_response(?CACHES_CMD, 200, _Params, Payload) -> 
-	CacheList = jsondoc_query:select(Payload, [<<"caches">>, <<"cache">>]),
-	{ok, CacheList};
+process_response(?CACHES_CMD, 200, _Params, Payload) ->
+  CacheList = jsondoc_query:select(Payload, [<<"caches">>, <<"cache">>]),
+  {ok, CacheList};
 % -else-
-process_response(_Cmd, _Status, _Params, empty) -> {error, invalid_response};
-process_response(_Cmd, _Status, _Params, Payload) -> process_error(Payload).
+process_response(_Cmd, _Status, _Params, empty)       -> {error, invalid_response};
+process_response(_Cmd, _Status, _Params, Payload)     -> process_error(Payload).
 
 process_error(Error) ->
-	Reason = jsondoc:get_value(?ERROR_REASON_TAG, Error),
-	{error, Reason}.
+  Reason = jsondoc:get_value(?ERROR_REASON_TAG, Error),
+  {error, Reason}.
 
 call(Operation, Resource) ->
-	poolboy:transaction(?MODULE, fun(Worker) ->
-				mec:call(Worker, Operation, Resource)
-		end).
+  poolboy:transaction(?MODULE, fun(Worker) ->
+    Request = #mercury_request{
+      operation = Operation,
+      resource = Resource
+    },
+    mec:call(Worker, Request)
+  end).
 
 call(Operation, Resource, Params) ->
-	poolboy:transaction(?MODULE, fun(Worker) ->
-				mec:call(Worker, Operation, Resource, Params)
-		end).
+  poolboy:transaction(?MODULE, fun(Worker) ->
+    Request = #mercury_request{
+      operation = Operation,
+      resource = Resource,
+      params = Params
+    },
+    mec:call(Worker, Request)
+  end).
 
 call(Operation, Resource, Params, Payload) ->
-	poolboy:transaction(?MODULE, fun(Worker) ->
-				mec:call(Worker, Operation, Resource, Params, Payload)
-		end).
+  poolboy:transaction(?MODULE, fun(Worker) ->
+    Request = #mercury_request{
+      operation = Operation,
+      resource = Resource,
+      params = Params,
+      payload = Payload
+    },
+    mec:call(Worker, Request)
+  end).

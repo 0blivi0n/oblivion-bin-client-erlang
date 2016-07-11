@@ -25,7 +25,7 @@
 %% ====================================================================
 
 start(_Type, _StartArgs) ->
-	pencil_sup:start_link().
+  pencil_sup:start_link().
 
 stop(_State) ->
-	ok.
+  ok.
